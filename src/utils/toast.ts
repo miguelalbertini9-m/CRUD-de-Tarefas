@@ -1,17 +1,19 @@
-import { toast } from "sonner";
+import { toast as sonnerToast } from "sonner";
+
+export const toast = sonnerToast;
 
 export const showSuccess = (message: string) => {
-  toast.success(message);
+  sonnerToast.success(message);
 };
 
 export const showError = (message: string) => {
-  toast.error(message);
+  sonnerToast.error(message);
 };
 
 export const showLoading = (message: string) => {
-  return toast.loading(message);
+  return sonnerToast.loading(message);
 };
 
 export const dismissToast = (toastId: string) => {
-  toast.dismiss(toastId);
+  sonnerToast.dismiss(toastId);
 };
