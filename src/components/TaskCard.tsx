@@ -2,19 +2,12 @@
 
 import { useState } from "react";
 import { Task } from "@/types/task";
-import { toast } from "@/utils/toast";
 
 interface Props {
   task: Task;
-  onUpdate: (updates: Partial<Task>) => void;
-  onDelete: () => void;
+  onUpdate: (id: string, updates: Partial<Task>) => void;
+  onDelete: (id: string) => void;
 }
-
-const statusOptions = [
-  { value: "pending", label: "Pendente" },
-  { value: "in-progress", label: "Em andamento" },
-  { value: "completed", label: "Concluída" },
-] as const;
 
 export const TaskCard = ({ task, onUpdate, onDelete }: Props) => {
   const [editing, setEditing] = useState(false);
@@ -25,37 +18,38 @@ export const TaskCard = ({ task, onUpdate, onDelete }: Props) => {
   const handleSave = () => {
     if (!title.trim()) return;
     setSaving(true);
+
     const updates: Partial<Task> = {
       title: title.trim(),
       status,
       completed_at: status === "completed" ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
-    onUpdate(updates);
+
+    onUpdate(task.id, updates);
+    setEditing(false);
     setSaving(false);
-    toast.success("Tarefa atualizada");
   };
 
   const handleDelete = () => {
-    onDelete();
-    toast.success("Tarefa excluída");
+    onDelete(task.id);
   };
 
   if (editing) {
     return (
-      <div className="bg-white rounded-xl p-4 space-y-3">
+      <div className="bg-white rounded-xl p-4 space-y-3 shadow">
         <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             autoFocus
           />
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
           >
             {saving ? "Salvando…" : "Salvar"}
           </button>
@@ -64,13 +58,11 @@ export const TaskCard = ({ task, onUpdate, onDelete }: Props) => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as Task["status"])}
-            className="border border-gray-300 rounded-md p-1"
+            className="border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            {statusOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
+            <option value="pending">Pendente</option>
+            <option value="in-progress">Em andamento</option>
+            <option value="completed">Concluída</option>
           </select>
           <button
             onClick={handleDelete}
@@ -95,13 +87,18 @@ export const TaskCard = ({ task, onUpdate, onDelete }: Props) => {
         >
           {title}
         </span>
-        <div className="status-toggle flex items-center">
+        <div className="flex items-center">
           <span
             className={`w-4 h-4 rounded-full border-2 border-gray-500 ${
               status === "completed" ? "bg-green-500" : "bg-gray-200"
-            }`}
+            } cursor-pointer`}
             onClick={() => {
-              setStatus(status === "completed" ? "pending" : "completed");
+              const newStatus = status === "completed" ? "pending" : "completed";
+              onUpdate(task.id, {
+                status: newStatus,
+                completed_at: newStatus === "completed" ? new Date().toISOString() : null,
+                updated_at: new Date().toISOString(),
+              });
             }}
           />
           <span className="ml-2 text-sm text-gray-500">
@@ -109,7 +106,7 @@ export const TaskCard = ({ task, onUpdate, onDelete }: Props) => {
           </span>
         </div>
       </div>
-      <div className="action-buttons flex gap-2">
+      <div className="flex gap-2">
         <button
           onClick={() => setEditing(true)}
           className="text-sm text-blue-600 hover:underline"
