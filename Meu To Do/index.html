@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu To Do</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        #todo-section { display: none; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #eee; margin: 5px 0; padding: 10px; border-radius: 4px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<!-- Tela de Login Obrigatória para a gravação -->
+<div class="container" id="login-section">
+    <h2>Login - Meu To Do</h2>
+    <p style="font-size: 12px; color: #666;">Use os dados padrão abaixo:</p>
+    <input type="email" id="email" value="aluno@teste.com">
+    <input type="password" id="senha" value="123">
+    <button onclick="fazerLogin()">Entrar</button>
+</div>
+
+<!-- Tela do Aplicativo de Tarefas -->
+<div class="container" id="todo-section">
+    <h2>Minhas Tarefas</h2>
+    <input type="text" id="nova-tarefa" placeholder="Digite uma tarefa...">
+    <button onclick="adicionarTarefa()">Adicionar</button>
+    <ul id="lista-tarefas"></ul>
+</div>
+
+<script>
+    function fazerLogin() {
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+        
+        // Validação simples para demonstração no vídeo
+        if(email === "aluno@teste.com" && senha === "123") {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('todo-section').style.display = 'block';
+        } else {
+            alert("Usuário ou senha incorretos.");
+        }
+    }
+
+    function adicionarTarefa() {
+        const input = document.getElementById('nova-tarefa');
+        const tarefa = input.value;
+        if(tarefa.trim() !== "") {
+            const li = document.createElement('li');
+            li.textContent = tarefa;
+            document.getElementById('lista-tarefas').appendChild(li);
+            input.value = "";
+        }
+    }
+</script>
+
+</body>
+</html>

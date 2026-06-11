@@ -1,0 +1,2 @@
+# Regras de Uso de IA no Projeto
+Este projeto utilizou assistência de Inteligência Artificial para a estruturação e validação do código HTML, estilização visual com CSS e manipulação de eventos em JavaScript para a lista de tarefas (To-Do).
