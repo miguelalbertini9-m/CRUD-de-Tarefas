@@ -35,27 +35,70 @@
 </div>
 
 <script>
-    function fazerLogin() {
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
-        
-        // Validação simples para demonstração no vídeo
-        if(email === "aluno@teste.com" && senha === "123") {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('todo-section').style.display = 'block';
-        } else {
-            alert("Usuário ou senha incorretos.");
-        }
-    }
+function fazerLogin() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
 
-    function adicionarTarefa() {
-        const input = document.getElementById('nova-tarefa');
-        const tarefa = input.value;
-        if(tarefa.trim() !== "") {
-            const li = document.createElement('li');
-            li.textContent = tarefa;
-            document.getElementById('lista-tarefas').appendChild(li);
-            input.value = "";
+    if(email === "aluno@teste.com" && senha === "123") {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('todo-section').style.display = 'block';
+    } else {
+        alert("Usuário ou senha incorretos.");
+    }
+}
+
+function adicionarTarefa() {
+    const input = document.getElementById('nova-tarefa');
+    const tarefa = input.value;
+    
+    if (tarefa.trim() !== "") {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.padding = '8px';
+        li.style.borderBottom = '1px solid #eee';
+        
+        // Texto da tarefa
+        const spanTexto = document.createElement('span');
+        spanTexto.textContent = tarefa;
+        li.appendChild(spanTexto);
+
+        // Container dos botões
+        const botoes = document.createElement('div');
+
+        // Botão Editar
+        const btnEditar = document.createElement('button');
+        btnEditar.textContent = '✏️ Editar';
+        btnEditar.style.marginRight = '8px';
+        btnEditar.style.cursor = 'pointer';
+        btnEditar.onclick = function() {
+            const novoTexto = prompt("Edite sua tarefa:", spanTexto.textContent);
+            if (novoTexto !== null && novoTexto.trim() !== "") {
+                spanTexto.textContent = novoTexto.trim();
+            }
+        };
+
+        // Botão Excluir
+        const btnExcluir = document.createElement('button');
+        btnExcluir.textContent = '❌ Excluir';
+        btnExcluir.style.cursor = 'pointer';
+        btnExcluir.style.color = 'red';
+        btnExcluir.onclick = function() {
+            if (confirm("Deseja mesmo excluir esta tarefa?")) {
+                li.remove();
+            }
+        };
+
+        botoes.appendChild(btnEditar);
+        botoes.appendChild(btnExcluir);
+        li.appendChild(botoes);
+        
+        document.getElementById('lista-tarefas').appendChild(li);
+        input.value = "";
+    }
+}
+</script>
         }
     }
 </script>
