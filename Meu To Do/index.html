@@ -39,7 +39,7 @@ function fazerLogin() {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
 
-    if(email === "aluno@teste.com" && senha === "123") {
+    if (email === "aluno@teste.com" && senha === "123") {
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('todo-section').style.display = 'block';
     } else {
@@ -59,15 +59,12 @@ function adicionarTarefa() {
         li.style.padding = '8px';
         li.style.borderBottom = '1px solid #eee';
         
-        // Texto da tarefa
         const spanTexto = document.createElement('span');
         spanTexto.textContent = tarefa;
         li.appendChild(spanTexto);
 
-        // Container dos botões
         const botoes = document.createElement('div');
 
-        // Botão Editar
         const btnEditar = document.createElement('button');
         btnEditar.textContent = '✏️ Editar';
         btnEditar.style.marginRight = '8px';
@@ -79,7 +76,6 @@ function adicionarTarefa() {
             }
         };
 
-        // Botão Excluir
         const btnExcluir = document.createElement('button');
         btnExcluir.textContent = '❌ Excluir';
         btnExcluir.style.cursor = 'pointer';
@@ -99,9 +95,3 @@ function adicionarTarefa() {
     }
 }
 </script>
-        }
-    }
-</script>
-
-</body>
-</html>
