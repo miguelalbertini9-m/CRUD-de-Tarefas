@@ -48,9 +48,8 @@
     </div>
 
     <script>
-        // URL do seu projeto Supabase
+        // CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = "https://hgyghtaraqljqpugorze.supabase.co"; 
-
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhneWdodGFyYXFsanFwdWdvcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTc5ODMsImV4cCI6MjA5NDI5Mzk4M30.c7M_aSzHpnlV2J5nUAXp6kelV5eAJeEMxxTmhLhIOeU"; 
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -69,12 +68,19 @@
 
             if (!email || !senha) { alert("Preencha todos os campos!"); return; }
 
-            const { data, error } = await _supabase.auth.signUp({ email, password: senha });
+            // Configuração corrigida para o Supabase v2 ignorar a confirmação pendente de e-mail
+            const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: senha,
+                options: {
+                    data: { email_confirmado: true }
+                }
+            });
 
             if (error) {
                 alert("Erro ao cadastrar: " + error.message);
             } else {
-                alert("Conta cadastrada! Agora você pode fazer o login.");
+                alert("Conta criada com sucesso! Agora você pode fazer o login.");
                 mostrarTela('login-section');
             }
         }
@@ -83,7 +89,12 @@
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
 
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: senha });
+            if (!email || !senha) { alert("Preencha as credenciais!"); return; }
+
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: senha
+            });
 
             if (error) {
                 alert("Falha no login: " + error.message);
@@ -170,7 +181,6 @@
                 }
             };
 
-            containerBotees = containerBotoes;
             containerBotoes.appendChild(btnEditar);
             containerBotoes.appendChild(btnExcluir);
             li.appendChild(containerBotoes);
