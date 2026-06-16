@@ -97,12 +97,18 @@
             const lista = document.getElementById('lista-tarefas');
             lista.innerHTML = "";
 
+            // Buscando os dados filtrando por 'User_id' exatamente como na foto
             const { data: tarefas, error } = await _supabase
                 .from('Tarefas')
                 .select('*')
-                .eq('user_id', usuarioAtual.id);
+                .eq('User_id', usuarioAtual.id);
 
-            if (!error && tarefas) {
+            if (error) {
+                alert("Erro ao carregar tarefas: " + error.message);
+                return;
+            }
+
+            if (tarefas) {
                 tarefas.forEach(t => {
                     const desc = t.Descriçao || "Tarefa sem título";
                     renderizarNaTela(t.id, desc);
@@ -116,9 +122,10 @@
 
             if (textoTarefa.trim() === "") return;
 
+            // Inserindo com as colunas 'Descriçao' e 'User_id' idênticas às da imagem
             const { data, error } = await _supabase
                 .from('Tarefas')
-                .insert([{ Descriçao: textoTarefa, user_id: usuarioAtual.id }])
+                .insert([{ Descriçao: textoTarefa, User_id: usuarioAtual.id }])
                 .select();
 
             if (error) {
