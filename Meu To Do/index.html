@@ -3,142 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu To Do</title>
+    <title>Meu To Do - Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; margin: 20px; }
         h2 { margin-bottom: 20px; color: #333; }
-        input[type="text"], input[type="email"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
         button:hover { background-color: #004085; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
         ul { list-style: none; padding: 0; text-align: left; }
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .btn-acao {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            width: auto;
-            display: inline;
-            padding: 0 5px;
-        }
+        li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .btn-acao { background: none; border: none; cursor: pointer; font-size: 14px; width: auto; display: inline; padding: 0 5px; }
+        .alternar-link { color: #0056b3; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div id="login-section" class="container">
         <h2>Login - Meu To Do</h2>
-        <p style="font-size: 12px; color: #666;">Use os dados padrão abaixo:</p>
-        <input type="email" id="email" value="aluno@teste.com" readonly>
-        <input type="password" id="senha" placeholder="Digite a senha (123)">
+        <input type="email" id="login-email" placeholder="E-mail">
+        <input type="password" id="login-senha" placeholder="Senha">
         <button onclick="fazerLogin()">Entrar</button>
+        <p>Não tem conta? <span class="alternar-link" onclick="mostrarTela('cadastro-section')">Cadastre-se aqui</span></p>
+    </div>
+
+    <div id="cadastro-section" class="container" style="display: none;">
+        <h2>Criar Conta</h2>
+        <input type="email" id="cadastro-email" placeholder="Seu E-mail">
+        <input type="password" id="cadastro-senha" placeholder="Escolha uma Senha">
+        <button onclick="fazerCadastro()">Registrar Conta</button>
+        <p>Já tem conta? <span class="alternar-link" onclick="mostrarTela('login-section')">Voltar para o Login</span></p>
     </div>
 
     <div id="todo-section" class="container" style="display: none;">
         <h2>Minhas Tarefas</h2>
-        <input type="text" id="nova-tarefa" placeholder="Digite uma tarefa...">
+        <p style="font-size: 12px; color: #28a745; font-weight: bold;" id="usuario-logado-txt"></p>
+        <input type="text" id="nova-tarefa" placeholder="Digite uma nova tarefa...">
         <button onclick="adicionarTarefa()">Adicionar</button>
         <ul id="lista-tarefas"></ul>
+        <button class="btn-secondary" onclick="fazerLogout()">Sair da Conta</button>
     </div>
 
     <script>
-    function fazerLogin() {
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
+        const SUPABASE_URL = "https://hgyghtaraqljqpugorze.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhneWdodGFyYXFsanFwdWdvcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTc5ODMsImV4cCI6MjA5NDI5Mzk4M30.c7M_aSzHpnlV2J5nUAXp6kelV5eAJeEMxxTmhLhIOeU"; 
 
-        if (email === "aluno@teste.com" && senha === "123") {
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let usuarioAtual = null;
+
+        function mostrarTela(idTela) {
             document.getElementById('login-section').style.display = 'none';
-            document.getElementById('todo-section').style.display = 'block';
-        } else {
-            alert("Usuário ou senha incorretos.");
+            document.getElementById('cadastro-section').style.display = 'none';
+            document.getElementById('todo-section').style.display = 'none';
+            document.getElementById(idTela).style.display = 'block';
         }
-    }
 
-    function adicionarTarefa() {
-        const input = document.getElementById('nova-tarefa');
-        const tarefa = input.value;
-        
-        if (tarefa.trim() !== "") {
+        async function fazerCadastro() {
+            const email = document.getElementById('cadastro-email').value;
+            const senha = document.getElementById('cadastro-senha').value;
+
+            if (!email || !senha) { alert("Preencha todos os campos!"); return; }
+
+            const { data, error } = await _supabase.auth.signUp({ email, password: senha });
+
+            if (error) {
+                alert("Erro ao cadastrar: " + error.message);
+            } else {
+                alert("Conta cadastrada! Agora você pode fazer o login.");
+                mostrarTela('login-section');
+            }
+        }
+
+        async function fazerLogin() {
+            const email = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: senha });
+
+            if (error) {
+                alert("Falha no login: " + error.message);
+            } else {
+                usuarioAtual = data.user;
+                document.getElementById('usuario-logado-txt').textContent = `Conectado como: ${usuarioAtual.email}`;
+                mostrarTela('todo-section');
+                carregarTarefas(); 
+            }
+        }
+
+        async function carregarTarefas() {
+            const lista = document.getElementById('lista-tarefas');
+            lista.innerHTML = "";
+
+            const { data: tarefas, error } = await _supabase
+                .from('tarefas')
+                .select('*')
+                .eq('user_id', usuarioAtual.id);
+
+            if (!error && tarefas) {
+                tarefas.forEach(t => renderizarNaTela(t.id, t.descricao));
+            }
+        }
+
+        async function adicionarTarefa() {
+            const input = document.getElementById('nova-tarefa');
+            const descricao = input.value;
+
+            if (descricao.trim() === "") return;
+
+            const { data, error } = await _supabase
+                .from('tarefas')
+                .insert([{ descricao: descricao, user_id: usuarioAtual.id }])
+                .select();
+
+            if (error) {
+                alert("Erro ao salvar tarefa: " + error.message);
+            } else {
+                renderizarNaTela(data[0].id, data[0].descricao);
+                input.value = "";
+            }
+        }
+
+        function renderizarNaTela(id, descricao) {
             const li = document.createElement('li');
-            
-            // Texto da tarefa
-            const spanTexto = document.createElement('span');
-            spanTexto.textContent = tarefa;
-            li.appendChild(spanTexto);
+            const span = document.createElement('span');
+            span.textContent = descricao;
+            li.appendChild(span);
 
-            // Container dos botões
-            const botoesContainer = document.createElement('div');
+            const containerBotoes = document.createElement('div');
 
-            // Botão Editar
             const btnEditar = document.createElement('button');
             btnEditar.className = 'btn-acao';
             btnEditar.textContent = '✏️';
-            btnEditar.title = 'Editar tarefa';
-            btnEditar.onclick = function() {
-                const novoTexto = prompt("Edite sua tarefa:", spanTexto.textContent);
-                if (novoTexto !== null && novoTexto.trim() !== "") {
-                    spanTexto.textContent = novoTexto.trim();
+            btnEditar.onclick = async function() {
+                const novoTexto = prompt("Editar item:", span.textContent);
+                if (novoTexto && novoTexto.trim() !== "") {
+                    const { error } = await _supabase.from('tarefas').update({ descricao: novoTexto }).eq('id', id);
+                    if (!error) span.textContent = novoTexto;
                 }
             };
 
-            // Botão Excluir
             const btnExcluir = document.createElement('button');
             btnExcluir.className = 'btn-acao';
             btnExcluir.textContent = '❌';
-            btnExcluir.title = 'Excluir tarefa';
-            btnExcluir.onclick = function() {
-                if (confirm("Deseja mesmo excluir esta tarefa?")) {
-                    li.remove();
+            btnExcluir.onclick = async function() {
+                if (confirm("Deseja deletar essa tarefa?")) {
+                    const { error } = await _supabase.from('tarefas').delete().eq('id', id);
+                    if (!error) li.remove();
                 }
             };
 
-            botoesContainer.appendChild(btnEditar);
-            botoesContainer.appendChild(btnExcluir);
-            li.appendChild(botoesContainer);
-            
+            containerBotoes.appendChild(btnEditar);
+            containerBotoes.appendChild(btnExcluir);
+            li.appendChild(containerBotoes);
             document.getElementById('lista-tarefas').appendChild(li);
-            input.value = "";
         }
-    }
+
+        async function fazerLogout() {
+            await _supabase.auth.signOut();
+            usuarioAtual = null;
+            mostrarTela('login-section');
+        }
     </script>
 </body>
 </html>
