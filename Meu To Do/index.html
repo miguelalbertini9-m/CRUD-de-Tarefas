@@ -104,7 +104,7 @@
 
             if (!error && tarefas) {
                 tarefas.forEach(t => {
-                    const desc = t.descricao || t.Descricao || "Tarefa sem título";
+                    const desc = t.Descriçao || "Tarefa sem título";
                     renderizarNaTela(t.id, desc);
                 });
             }
@@ -116,26 +116,15 @@
 
             if (textoTarefa.trim() === "") return;
 
-            // Tenta salvar como 'descricao', se falhar tenta como 'Descricao'
-            let { data, error } = await _supabase
+            const { data, error } = await _supabase
                 .from('Tarefas')
-                .insert([{ descricao: textoTarefa, user_id: usuarioAtual.id }])
+                .insert([{ Descriçao: textoTarefa, user_id: usuarioAtual.id }])
                 .select();
-
-            if (error) {
-                const tentarNovamente = await _supabase
-                    .from('Tarefas')
-                    .insert([{ Descricao: textoTarefa, user_id: usuarioAtual.id }])
-                    .select();
-                
-                data = tentarNovamente.data;
-                error = tentarNovamente.error;
-            }
 
             if (error) {
                 alert("Erro ao salvar tarefa: " + error.message);
             } else {
-                const descSalva = data[0].descricao || data[0].Descricao;
+                const descSalva = data[0].Descriçao;
                 renderizarNaTela(data[0].id, descSalva);
                 input.value = "";
             }
@@ -155,11 +144,12 @@
             btnEditar.onclick = async function() {
                 const novoTexto = prompt("Editar item:", span.textContent);
                 if (novoTexto && novoTexto.trim() !== "") {
-                    let { error } = await _supabase.from('Tarefas').update({ descricao: novoTexto }).eq('id', id);
-                    if (error) {
-                        await _supabase.from('Tarefas').update({ Descricao: novoTexto }).eq('id', id);
-                    }
-                    span.textContent = novoTexto;
+                    const { error } = await _supabase
+                        .from('Tarefas')
+                        .update({ Descriçao: novoTexto })
+                        .eq('id', id);
+                        
+                    if (!error) span.textContent = novoTexto;
                 }
             };
 
