@@ -114,7 +114,7 @@
             if (descricao.trim() === "") return;
 
             const { data, error } = await _supabase
-                .from('tarefas')
+                .from('Tarefas')
                 .insert([{ descricao: descricao, user_id: usuarioAtual.id }])
                 .select();
 
@@ -140,7 +140,7 @@
             btnEditar.onclick = async function() {
                 const novoTexto = prompt("Editar item:", span.textContent);
                 if (novoTexto && novoTexto.trim() !== "") {
-                    const { error } = await _supabase.from('tarefas').update({ descricao: novoTexto }).eq('id', id);
+                    const { error } = await _supabase.from('Tarefas').update({ descricao: novoTexto }).eq('id', id);
                     if (!error) span.textContent = novoTexto;
                 }
             };
@@ -150,7 +150,7 @@
             btnExcluir.textContent = '❌';
             btnExcluir.onclick = async function() {
                 if (confirm("Deseja deletar essa tarefa?")) {
-                    const { error } = await _supabase.from('tarefas').delete().eq('id', id);
+                    const { error } = await _supabase.from('Tarefas').delete().eq('id', id);
                     if (!error) li.remove();
                 }
             };
@@ -158,7 +158,7 @@
             containerBotoes.appendChild(btnEditar);
             containerBotoes.appendChild(btnExcluir);
             li.appendChild(containerBotoes);
-            document.getElementById('lista-tarefas').appendChild(li);
+            document.getElementById('lista-Tarefas').appendChild(li);
         }
 
         async function fazerLogout() {
