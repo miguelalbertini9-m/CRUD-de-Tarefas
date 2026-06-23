@@ -10,14 +10,19 @@
         .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; margin: 20px; }
         h2 { margin-bottom: 20px; color: #333; }
         input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        button:hover { background-color: #004085; }
-        .btn-secondary { background-color: #6c757d; }
-        .btn-secondary:hover { background-color: #5a6268; }
+        
+        /* BOTÃO PRINCIPAL - PRETO COM ESCRITO BRANCO */
+        button { width: 100%; padding: 10px; background-color: #000000; color: #ffffff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-bottom: 10px; transition: background-color 0.2s ease; }
+        button:hover { background-color: #222222; }
+        
+        /* BOTÃO SECUNDÁRIO (SAIR) - CINZA ESCURO COM ESCRITO BRANCO */
+        .btn-secondary { background-color: #444444; color: #ffffff; }
+        .btn-secondary:hover { background-color: #333333; }
+        
         ul { list-style: none; padding: 0; text-align: left; }
         li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        .btn-acao { background: none; border: none; cursor: pointer; font-size: 14px; width: auto; display: inline; padding: 0 5px; }
-        .alternar-link { color: #0056b3; cursor: pointer; text-decoration: underline; font-size: 14px; }
+        .btn-acao { background: none; border: none; cursor: pointer; font-size: 14px; width: auto; display: inline; padding: 0 5px; margin-bottom: 0; }
+        .alternar-link { color: #000000; cursor: pointer; text-decoration: underline; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -50,6 +55,8 @@
     <script>
         // CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = "https://hgyghtaraqljqpugorze.supabase.co"; 
+
+        
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhneWdodGFyYXFsanFwdWdvcnplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTc5ODMsImV4cCI6MjA5NDI5Mzk4M30.c7M_aSzHpnlV2J5nUAXp6kelV5eAJeEMxxTmhLhIOeU"; 
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -68,13 +75,9 @@
 
             if (!email || !senha) { alert("Preencha todos os campos!"); return; }
 
-            // Configuração corrigida para o Supabase v2 ignorar a confirmação pendente de e-mail
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
-                password: senha,
-                options: {
-                    data: { email_confirmado: true }
-                }
+                password: senha
             });
 
             if (error) {
